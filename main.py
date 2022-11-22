@@ -3,19 +3,18 @@ import re
 import colorama # Para colorear el texto en consola
 from colorama import Fore, Back, Style
 
-
 class Letra():
     """
     Esta clase permite manejar el color de las letras,
     y tiene un metodo que permite imprimir con ese color.
     """
     def __init__(self, letra= "-"):
-        self.letra = letra 
-        self.color = Fore.BLACK 
+        self.letra = letra
+        self.color = Fore.BLACK
 
     def imprimir(self):
         print(self.color+Style.BRIGHT+self.letra+Style.RESET_ALL, end="")
-        
+       
 
 
 
@@ -120,7 +119,7 @@ while True:
     # [Letra(A), Letra(S),...],
     # [Letra(Z),...]
     # ]
-  
+ 
     # Diccionario que permite acceder a la posicion de las letras del teclado inferior
     # en O(1), para evitar tener que iterar por fuerza bruta sobre `letras`
     dic_letras = {letras[i][j].letra:(i,j) for i in range(len(letras)) for j in range(len(letras[i])) }
@@ -130,15 +129,15 @@ while True:
 
     # Se crean las 6 palabras que adivinara el usuario.
     # Inicialmente todos los caracteres son "-"
-    attempts = [ 
+    attempts = [
         [Letra() for i in range(num)]
         for j in range(6)
     ]
     intentos = ["Primer", "Segundo","Tercer","Cuarto","Quinto", "Sexto"]
     gano  =False
 
-    for intento in range(len(intentos)):
-        dic_temp = freq_letters.copy() #O(num) 
+    for intento in range(len(intentos)): #O(6*num)=O(num)
+        dic_temp = freq_letters.copy() #O(num)
         print(f"{intentos[intento]} intento. Te quedan {6-intento} oportunidades...")
         dibujar(attempts, letras) #O(num)
 
@@ -164,29 +163,35 @@ while True:
 
         # Coloreando tanto las letras de los intentos
         # como del teclado:
-        for i in range(num):
+        for i in range(num):#O(num) ya que todas las operaciones son indexaciones en listas y diccionarios o busquedas en conjuntos, las cuales son O(1)
             attempts[intento][i].letra = curr[i]
             posi, posj = dic_letras[curr[i]]
+          #colorear en verde
             if word[i] == curr[i]:
                 attempts[intento][i].color=Fore.GREEN
                 letras[posi][posj].color = Fore.GREEN
 
             elif (curr[i] in set_word):
+              #colorear en amarillo
                 if (dic_temp[curr[i]]>0):
                     attempts[intento][i].color=Fore.YELLOW
                     if letras[posi][posj].color == Fore.BLACK:
                         letras[posi][posj].color = Fore.YELLOW
+                      #ejemplo:pana, supongamos que se ingresa pepe.
+                      #la primera p debe aparecer en verde y la segunda en roja, ya que en la palabra solo hay una
                 else:
                     attempts[intento][i].color=Fore.RED
                     if letras[posi][posj].color == Fore.BLACK:
-                        letras[posi][posj].color = Fore.RED                    
+                        letras[posi][posj].color = Fore.RED                    #la letra no pertenece a la palabra()
             else:
                 attempts[intento][i].color=Fore.RED
                 letras[posi][posj].color = Fore.RED
+        #O(num) porque revisa letra por letra
         if curr==word:
             gano = True
             break
-    dibujar(attempts, letras)
+    
+    dibujar(attempts, letras) #O(num). Ya se explica dentro de la funcion
     if gano:
         ganadas += 1
         print(f"¡FELICITACIONES CAMPEON! Has adivinado la palabra en {intento+1} intentos.")
@@ -215,4 +220,3 @@ while True:
         continue
     else:
         break
-    
